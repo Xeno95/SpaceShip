@@ -149,7 +149,8 @@ def gra():
         # generowanie kuli
         current_time = pygame.time.get_ticks()
         time_since_last_ball = current_time - last_ball_time
-        if time_since_last_ball > random.randint(0, 100) and len(balls) < 5:
+        meteor_count = sum(1 for b in balls if b['type'] == 'ball')
+        if time_since_last_ball > random.randint(0, 100) and meteor_count < 5:
             ball_x = screen_width
             ball_y = random.randint(0, screen_height - ball_image.get_height())
             ball_speed = random.uniform(1.0, 2.5)
