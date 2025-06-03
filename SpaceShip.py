@@ -3,6 +3,9 @@ import pygame
 import random
 
 
+FPS = 60
+
+
 def show_image_and_text(image_path, text, screen, result):
     image = pygame.image.load(image_path)
     image_rect = image.get_rect(center=screen.get_rect().center)
@@ -44,8 +47,14 @@ def show_lives(screen, hit, max_lives):
 
 
 def gra():
+    """Run a single game instance.
+
+    Returns True when the game should restart or False when the user quits.
+    """
     # inicjowanie Pygame
     pygame.init()
+
+    clock = pygame.time.Clock()
 
     # Wynik
     result = 0
@@ -65,7 +74,7 @@ def gra():
     ball_image = pygame.image.load('[Pliki]/Kula.png')
 
     # załadowanie grafiki nowego elementu
-    Shoot = pygame.image.load('[Pliki]/Strzal.png')
+    shoot_image = pygame.image.load('[Pliki]/Strzal.png')
 
     # pozycja postaci
     player_x = 80
@@ -95,8 +104,7 @@ def gra():
         # obsługa zdarzeń (klawiatura, mysz, zamknięcie okna)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                return False
 
             # strzał
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -149,7 +157,7 @@ def gra():
             last_ball_time = current_time
 
         # poruszanie kul
-        for ball in balls:
+        for ball in balls[:]:
             if ball['type'] == 'ball':
                 ball['x'] -= ball['speed']
             else:
@@ -182,10 +190,14 @@ def gra():
             # detekcja kolizji ze strzałem, i zmiana wielkości
             for ball in balls[:]:
                 if ball['type'] == 'bullet':
-                    ball_rect = pygame.Rect(ball['x'], ball['y'], Shoot.get_width() + 5,
-                                            Shoot.get_height() + 10)  # zwiększenie hitboxa
+                    ball_rect = pygame.Rect(
+                        ball['x'],
+                        ball['y'],
+                        shoot_image.get_width() + 5,
+                        shoot_image.get_height() + 10,
+                    )  # zwiększenie hitboxa
                     ball_rect.x += ball['speed']
-                    for ball2 in balls:
+                    for ball2 in balls[:]:
                         if ball2['type'] == 'ball':
                             ball2_rect = pygame.Rect(ball2['x'], ball2['y'], ball_image.get_width() + 10,
                                                      ball_image.get_height() + 20)  # zwiększenie hitboxa
@@ -197,7 +209,7 @@ def gra():
                     if ball_rect.x > screen.get_width():
                         balls.remove(ball)
                     else:
-                        screen.blit(Shoot, ball_rect)
+                        screen.blit(shoot_image, ball_rect)
 
         # rysowanie obiektów na ekranie
         screen.blit(background, (0, 0))
@@ -206,15 +218,23 @@ def gra():
             if ball['type'] == 'ball':
                 screen.blit(ball_image, (ball['x'], ball['y']))
             else:
-                screen.blit(Shoot, (ball['x'], ball['y']))
+                screen.blit(shoot_image, (ball['x'], ball['y']))
 
         # rysowanie tekstu
         show_lives(screen, hit, max_lives)
 
         # aktualizacja ekranu
         pygame.display.update()
+        clock.tick(FPS)
+
+
+def main() -> None:
+    """Entry point of the game."""
+    while gra():
+        pass
+    pygame.quit()
+    sys.exit()
 
 
 if __name__ == "__main__":
-    while True:
-        gra()
+    main()
