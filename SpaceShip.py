@@ -176,7 +176,7 @@ def gra():
                         screen.fill((0, 0, 0))
                         show_image_and_text('[Pliki]/Koniec.png', str(i), screen, result)
                         pygame.time.wait(900)
-                    gra()
+                    return
                 # TODO: obsługa kolizji z kulką
 
             # detekcja kolizji ze strzałem, i zmiana wielkości
@@ -215,4 +215,6 @@ def gra():
         pygame.display.update()
 
 
-gra()
+if __name__ == "__main__":
+    while True:
+        gra()
